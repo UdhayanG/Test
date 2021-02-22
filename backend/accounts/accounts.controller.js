@@ -141,7 +141,7 @@ function register(req, res, next) {
     console.log("register req.body"+JSON.stringify(req.body));
 
     accountService.register(req.body, req.get('origin'))
-        .then(() => res.json({ message: 'Registration successful, please check your email for verification instruction' }))
+        .then(() => res.json({ message: 'Registration successful, please check your email for verification instructions' }))
         .catch(next);
 }
 
