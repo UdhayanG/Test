@@ -1,0 +1,116 @@
+/*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+.example-full-width{
+  width: 100%;
+}
+.img{
+  width: 100%;
+}
+
+.border-md {
+    border-width: 2px;
+}
+
+.btn-facebook {
+    background: #405D9D;
+    border: none;
+}
+
+.btn-facebook:hover, .btn-facebook:focus {
+    background: #314879;
+}
+
+.btn-twitter {
+    background: #dd4b39;
+    border: none;
+}
+
+.btn-twitter:hover, .btn-twitter:focus {
+    background:  red;
+}
+
+
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSES
+* ==========================================
+*
+*/
+
+body {
+    min-height: 100vh;
+}
+
+.form-control:not(select) {
+    padding: 1.5rem 0.5rem;
+}
+
+select.form-control {
+    height: 52px;
+    padding-left: 0.5rem;
+}
+
+.form-control::placeholder {
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+.form-control:focus {
+    box-shadow: none;
+}
+
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+ }
+ .centerd{
+  display: block;
+  margin-top: auto;
+  text-align: center;
+ }
+ .padder{
+  padding: 10px;
+ }
+/* added for error messages*/
+ .redfont{
+     color:#f44336;
+ }
+ mat-form-field{
+  padding: 0px!important;
+ }
+ #nomargin{
+  position: relative;
+  top: -10px;
+  float: right;
+ }
+ .overfl{
+  overflow: hidden;
+
+ }
+ .widther{
+  width: 100%;
+ }
+ .marger{
+  margin: 2px;
+ }
