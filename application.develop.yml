@@ -1,0 +1,34 @@
+database:
+  dialect: sqlite3
+  host:  book.db
+  port:
+  dbname: 
+  username: 
+  password: 
+  migration: true
+
+extension:
+  master_generator: true
+  cors_enabled: true
+  security_enabled: true
+
+log:
+  request_log_format: ${remote_ip} ${account_name} ${uri} ${method} ${status}
+
+staticcontents:
+  path: ./public/
+
+security:
+  auth_path:
+    - /api/.*
+  exclude_path:
+    - /api/account/login$
+    - /api/account/logout$
+    - /api/health$
+  user_path:
+    - /api/account/.*
+    - /api/master/.*
+    - /api/book/list
+    - /api/book/search.*
+  admin_path:
+    - /api/.*

@@ -1,0 +1,31 @@
+database:
+  dialect: postgres
+  host: postgres-db
+  port: 5432
+  dbname: testdb
+  username: testusr
+  password: testusr
+  migration: false
+
+extension:
+  master_generator: false
+  cors_enabled: false
+  security_enabled: true
+
+log:
+  request_log_format: ${remote_ip} ${account_name} ${uri} ${method} ${status}
+
+security:
+  auth_path:
+    - /api/.*
+  exclude_path:
+    - /api/account/login$
+    - /api/account/logout$
+    - /api/health$
+  user_path:
+    - /api/account/.*
+    - /api/master/.*
+    - /api/book/list
+    - /api/book/search.*
+  admin_path:
+    - /api/.*
