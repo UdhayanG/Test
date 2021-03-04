@@ -15,16 +15,16 @@ func InitMasterData(context mycontext.Context) {
 		a := model.NewAccountWithPlainPassword("test", "test", r.ID)
 		_, _ = a.Create(rep)
 
-		c := model.NewCategory("技術書")
+		c := model.NewCategory("Cat1")
 		_, _ = c.Create(rep)
-		c = model.NewCategory("雑誌")
+		c = model.NewCategory("Cat2")
 		_, _ = c.Create(rep)
-		c = model.NewCategory("小説")
+		c = model.NewCategory("Cat3")
 		_, _ = c.Create(rep)
 
-		f := model.NewFormat("書籍")
+		f := model.NewFormat("Fmt1")
 		_, _ = f.Create(rep)
-		f = model.NewFormat("電子書籍")
+		f = model.NewFormat("Fmt2")
 		_, _ = f.Create(rep)
 	}
 }
