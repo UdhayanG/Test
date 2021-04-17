@@ -1,41 +1,43 @@
 package main
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/ybkuroki/go-webapp-sample/config"
-	"github.com/ybkuroki/go-webapp-sample/logger"
-	"github.com/ybkuroki/go-webapp-sample/middleware"
-	"github.com/ybkuroki/go-webapp-sample/migration"
-	"github.com/ybkuroki/go-webapp-sample/mycontext"
-	"github.com/ybkuroki/go-webapp-sample/repository"
-	"github.com/ybkuroki/go-webapp-sample/router"
+	"RMS-Trail/datastore"
+	"RMS-Trail/handler"
+	"log"
+
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/go-playground/validator/v10"
+
+	"RMS-Trail/utils"
 )
-
 func main() {
+	db, err := datastore.NewDB()
+	logFatal(err)
+
+	db.LogMode(true)
+	defer db.Close()
+	
 	e := echo.New()
+	e.Validator = &utils.CustomValidator{Validator: validator.New()}
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.GET("/", handler.Welcome()) 
+	e.GET("/users", handler.GetUsers(db)) 
+	e.POST("/check", handler.Check(db))
+	//e.POST("/register", handler.Register(db)) 
+	e.POST("/register", handler.Register(db)) 
+	//e.POST("/address", handler.Address(db)) 
+	// graphql
+    /*	h, err := graphql.NewHandler(db)
+	logFatal(err)
+	e.POST("/graphql", echo.WrapHandler(h))*/
+	err = e.Start(":3000")
+	logFatal(err)
+}
 
-	conf, env := config.Load()
-	logger := logger.NewLogger(env)
-	logger.GetZapLogger().Infof("Loaded this configuration : application." + env + ".yml")
-
-	rep := repository.NewBookRepository(logger, conf)
-	context := mycontext.NewContext(rep, conf, logger)
-
-	migration.CreateDatabase(context)
-	migration.InitMasterData(context)
-
-	router.Init(e, context)
-	middleware.InitLoggerMiddleware(e, context)
-	middleware.InitSessionMiddleware(e, context)
-
-	if conf.StaticContents.Path != "" {
-		e.Static("/", conf.StaticContents.Path)
-		logger.GetZapLogger().Infof("Served the static contents. path: " + conf.StaticContents.Path)
+func logFatal(err error) {
+	if err != nil {
+		log.Fatalln(err)
 	}
-
-	if err := e.Start(":9000"); err != nil {
-		logger.GetZapLogger().Errorf(err.Error())
-	}
-
-	defer rep.Close()
 }
