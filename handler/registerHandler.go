@@ -106,7 +106,7 @@ func Register(db *gorm.DB) echo.HandlerFunc{
 					UserName:u.PhoneNumber,
 					LoginTypeID:loginTypes.LoginTypeID,
 					UserNameVerified:0,
-					LoginPassword:u.Password,
+					//LoginPassword:u.Password,
 					LoginPasswordSalt:string(hash)}
 
 					loginObject := db.Save(&loginInsert)
