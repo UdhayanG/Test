@@ -31,13 +31,16 @@ import (
 
 func Register(db *gorm.DB) echo.HandlerFunc{
 	return func (c echo.Context) error {
-		u := new(form.Registration)
-		if err :=c.Bind(u); err !=nil{
+		//u := new(form.Registration)
+		var u form.Registration
+		if err :=c.Bind(&u); err !=nil{
 			return err 
 		}
 
-		if err := c.Validate(u); err != nil {
-			return err 
+		if err := c.Validate(&u); err != nil {
+
+			fmt.Println(err)
+			return c.JSON(http.StatusUnauthorized,err.Error())
 		}
 
 
