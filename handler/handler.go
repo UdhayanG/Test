@@ -4,8 +4,8 @@ import (
 	"RMS-Trail/domain/model"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
-
+	//"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"github.com/labstack/echo"
 
 )

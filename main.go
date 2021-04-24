@@ -1,22 +1,30 @@
 package main
 
 import (
-	"RMS-Trail/datastore"
+	//"RMS-Trail/datastore"
 	"RMS-Trail/handler"
 	"log"
-
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/go-playground/validator/v10"
-
+	"gopkg.in/go-playground/validator.v9"
 	"RMS-Trail/utils"
+	"gorm.io/gorm"
+   "gorm.io/driver/mysql"
+  // "github.com/onrik/gorm-logrus"
+   "gorm.io/gorm/logger"
 )
 func main() {
-	db, err := datastore.NewDB()
-	logFatal(err)
+	dsn := "root:root@tcp(127.0.0.1:3306)/rms-golang?charset=utf8mb4&parseTime=True&loc=Local"
+  db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{ Logger: logger.Default.LogMode(logger.Error), })
+  if err != nil {
+    panic("failed to connect database")
+  }
+	//db, err := datastore.NewDB()
+	//logFatal(err)
 
-	db.LogMode(true)
-	defer db.Close()
+	//db.LogMode(true)
+	//db.Logger.LogMode(logger.Info)
+	//defer db.Close()
 	
 	e := echo.New()
 	e.Validator = &utils.CustomValidator{Validator: validator.New()}

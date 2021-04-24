@@ -5,16 +5,32 @@ import (
 	"RMS-Trail/domain/form"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
+	//"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+   //"gorm.io/driver/mysql"
 
 	"github.com/labstack/echo"
 	
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
+	
+	
+
+	//"github.com/go-playground/locales/en"
+//	ut "github.com/go-playground/universal-translator"
+//	"gopkg.in/go-playground/validator.v9"
+//	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
+	
 	
 	//"strconv"
 )
+// use a single instance , it caches struct info
+//var (
+//	uni      *ut.UniversalTranslator
+//	validate *validator.Validate
+//)
 
 /*func Register(db *gorm.DB) echo.HandlerFunc{
 	return func (c echo.Context) error {
@@ -29,108 +45,69 @@ import (
 	}
 }*/
 
-func Register(db *gorm.DB) echo.HandlerFunc{
+func Register(tx *gorm.DB) echo.HandlerFunc{
 	return func (c echo.Context) error {
-		//u := new(form.Registration)
-		var u form.Registration
-		if err :=c.Bind(&u); err !=nil{
-			return err 
-		}
+		//To perform a set of Registration operations within a transaction
+		tx.Transaction(func(db *gorm.DB) error {
+			var u form.Registration
+			if err :=c.Bind(&u); err !=nil{
+				return c.JSON(http.StatusUnauthorized,err.Error())
+			}
+			if err := c.Validate(&u); err != nil {
+				fmt.Println(err)
+				return c.JSON(http.StatusUnauthorized,err.Error())
+			}
+			if strings.Compare(u.Password, u.ConfirmPassword)!=0{
+				return c.JSON(http.StatusUnauthorized,"Password Mismatch, Please enter correctly")
 
-		if err := c.Validate(&u); err != nil {
-
-			fmt.Println(err)
-			return c.JSON(http.StatusUnauthorized,err.Error())
-		}
-
-
-		var login model.Logins
-		duplicateUserCheck := db.Where("UserName = ? ",u.PhoneNumber).Find(&login)
-
-		if(duplicateUserCheck.RowsAffected>=1){
-			return c.JSON(http.StatusCreated, "User Name already exists")
-		}
-		fmt.Println(duplicateUserCheck.RowsAffected)
-		var loginTypes model.LoginTypes
-		var phoneNoTypes model.PhoneNoTypes
-		var countries model.Countries
-			lt := db.Select("LoginTypeID").Where("LoginTypeDesc = ?", "Phone").First(&loginTypes)
-			pt := db.Select("PhoneNoTypeID").Where("PhoneNoTypeDesc = ?", "Mobile").First(&phoneNoTypes)
-			country := db.Select("CountryID").Where("CountryName = ?", "INDIA").First(&countries)
-			ltv ,err:= json.Marshal(lt.Value)
-			ptv ,err:= json.Marshal(pt.Value)
-			cv ,err:= json.Marshal(country.Value)
-			if err == nil {	
-				json.Unmarshal([]byte(ltv), &loginTypes)
-				json.Unmarshal([]byte(ptv), &phoneNoTypes)
-				json.Unmarshal([]byte(cv), &countries)
-				//loginTypeId := strconv.Itoa(loginTypes.LoginTypeID)
-				//phoneTypeId := strconv.Itoa(phoneNoTypes.PhoneNoTypeID)
-				//countryId := strconv.Itoa(countries.CountryID)
-				phoneInsert := model.PhoneNumbers{CountryID:countries.CountryID,
-					PhoneNumber:u.PhoneNumber,
-					NumberinInterForm:0,
-					PhoneNoTypeID:phoneNoTypes.PhoneNoTypeID}
-
-				phoneObject := db.Save(&phoneInsert)
-				phoneValue, err := json.Marshal(phoneObject.Value)
-				var phoneModel model.PhoneNumbers
-				if err == nil {	
-
-					json.Unmarshal([]byte(phoneValue), &phoneModel)
-
+			}
+			var login model.Logins
+			duplicateUserCheck := db.Debug().Where("UserName = ? ",u.PhoneNumber).Find(&login)
+			if(duplicateUserCheck.RowsAffected>=1){
+				return c.JSON(http.StatusCreated, "User Name already exists")
+			}
+			var loginTypes model.LoginTypes
+			var phoneNoTypes model.PhoneNoTypes
+			var countries model.Countries			
+				db.Select("LoginTypeID").Where("LoginTypeDesc = ?", "Phone").First(&loginTypes)
+				db.Select("PhoneNoTypeID").Where("PhoneNoTypeDesc = ?", "Mobile").First(&phoneNoTypes)
+				db.Select("CountryID").Where("CountryName = ?", "INDIA").First(&countries)
+				phoneInsert := model.PhoneNumbers{CountryID:countries.CountryID,PhoneNumber:u.PhoneNumber,PhoneNoTypeID:phoneNoTypes.PhoneNoTypeID}
+				if err := db.Debug().Save(&phoneInsert).Error; err != nil {
+					//fmt.Println(err)
+					return c.JSON(http.StatusCreated, err)
 				}
-				userInsert := model.User{
-					FirstName:u.FirstName,
-					MiddleName:u.MiddleName,
-					LastName:u.LastName,
-					DefaultAddressID:1,
-					DefaultPhoneID:phoneModel.PhoneNoID}
-				
-				userObject :=	db.Save(&userInsert)
-				userValue, err := json.Marshal(userObject.Value)
-				var userModel model.User
-				if err == nil {	
-					json.Unmarshal([]byte(userValue), &userModel)
+				fmt.Println(phoneInsert.PhoneNoID)
+				userInsert := model.User{FirstName:u.FirstName,MiddleName:u.MiddleName,LastName:u.LastName,DefaultAddressID:1,DefaultPhoneID:phoneInsert.PhoneNoID}
+				if err := db.Debug().Save(&userInsert).Error; err != nil {
+					//fmt.Println(err)
+					return c.JSON(http.StatusInternalServerError, "Registration failed")
 				}
-				phoneUserInsert := model.UserPhoneNumbers{
-					UserID:userModel.UserID,
-					PhoneNoID:phoneModel.PhoneNoID}
-				db.Save(&phoneUserInsert)
-				//fmt.Println(loginTypeId)
-				//fmt.Println(phoneTypeId)
-				//fmt.Println(countryId)
+				phoneUserInsert := model.UserPhoneNumbers{UserID:userInsert.UserID,PhoneNoID:phoneInsert.PhoneNoID}
+				if err := db.Debug().Save(&phoneUserInsert).Error; err != nil {
+					//fmt.Println(err)
+					return c.JSON(http.StatusInternalServerError, "Registration failed")
+				}	
 				hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MinCost)
-    			if err != nil {
-					fmt.Println(err)
-   				}
-
-				loginInsert := model.Logins{
-					UserName:u.PhoneNumber,
-					LoginTypeID:loginTypes.LoginTypeID,
-					UserNameVerified:0,
-					//LoginPassword:u.Password,
-					LoginPasswordSalt:string(hash)}
-
-					loginObject := db.Save(&loginInsert)
-					loginValue, err := json.Marshal(loginObject.Value)
-					var loginModel model.Logins
-					if err == nil {	
-						json.Unmarshal([]byte(loginValue), &loginModel)
-					}
-					loginUserInsert := model.UserLogins{
-						UserID:userModel.UserID,
-						LoginID:loginModel.LoginID}
-					db.Save(&loginUserInsert)
-					return c.JSON(http.StatusCreated, "Registered Successfully")
- 			}
-					
-			//str := strconv.Itoa(addr.AddressID)
-			//fmt.Println(str)
-		//	s := model.PhoneNoTypes{PhoneNoTypeDesc:str}
-			//db.Save(&s)
-			
-		 
-		return c.JSON(http.StatusCreated, "result")
+				if err != nil {
+					//fmt.Println(err)
+					return c.JSON(http.StatusInternalServerError, "Registration failed")
+				}
+				loginInsert := model.Logins{UserName:u.PhoneNumber,LoginTypeID:loginTypes.LoginTypeID,UserNameVerified:0,LoginPasswordSalt:string(hash)}
+				if err := db.Debug().Save(&loginInsert).Error; err != nil {
+					//fmt.Println(err)
+					return c.JSON(http.StatusInternalServerError, "Registration failed")
+				}	
+				loginUserInsert := model.UserLogins{UserID:userInsert.UserID,LoginID:loginInsert.LoginID}
+				if err := db.Debug().Save(&loginUserInsert).Error; err != nil {
+					//fmt.Println(err)
+					return c.JSON(http.StatusInternalServerError, "Registration failed")
+				}
+				return c.JSON(http.StatusCreated, "Registered Successfully")
+		})
+				return nil
 	}
+	//return err
 }
+
+
