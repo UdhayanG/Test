@@ -31,7 +31,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			//fmt.Println(key)
 			//errRes +=`
 			//,`
-			errRes += key.Translate(trans)
+			errRes += key.Translate(trans)+","
 						
 			fmt.Println(errRes)
 			//return errors.New(string(key.Translate(trans)))

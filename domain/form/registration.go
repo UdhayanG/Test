@@ -37,4 +37,7 @@ type Registration struct {
 	LastName   		 string     `json:"LastName" form:"LastName" query:"LastName"`
 	DefaultAddressID int      `json:"DefaultAddressID" form:"DefaultAddressID" query:"DefaultAddressID"`
 	DefaultPhoneID 	 int      `json:"DefaultPhoneID" form:"DefaultPhoneID" query:"DefaultPhoneID"`
-  }
+	RequestKey  	 string     `json:"RequestKey" form:"RequestKey" query:"RequestKey"`
+	Err				  string     `json:"Err" form:"Err" query:"Err"`
+
+}
