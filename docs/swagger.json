@@ -1,0 +1,16 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a Repair Management Application",
+        "title": "RMS Application",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/register",
+    "paths": {
+        "/register": {
+            "post": {}
+        }
+    }
+}

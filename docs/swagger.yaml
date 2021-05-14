@@ -1,0 +1,11 @@
+basePath: /register
+host: localhost:3000
+info:
+  contact: {}
+  description: This is a Repair Management Application
+  title: RMS Application
+  version: "1.0"
+paths:
+  /register:
+    post: {}
+swagger: "2.0"
