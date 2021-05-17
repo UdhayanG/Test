@@ -7,6 +7,7 @@ require (
 	cloud.google.com/go v0.81.0 // indirect
 	github.com/0xAX/notificator v0.0.0-20191016112426-3962a5ea8da1 // indirect
 	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
+	github.com/PrinceNorin/todo-go v0.0.0-20200223021404-39e006899cb7
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
 	github.com/casbin/casbin v1.8.2 // indirect
@@ -33,7 +34,7 @@ require (
 	github.com/kylelemons/go-gypsy v0.0.0-20160905020020-08cad365cd28 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/echo-contrib v0.9.0
-	github.com/labstack/echo/v4 v4.1.6
+	github.com/labstack/echo/v4 v4.1.14
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.0 // indirect
@@ -51,8 +52,6 @@ require (
 	github.com/steinbacher/goose v0.0.0-20160725131629-dc457c319503 // indirect
 	github.com/swaggo/echo-swagger v1.1.0
 	github.com/swaggo/swag v1.7.0 // indirect
-	github.com/ugorji/go v1.1.4 // indirect
-	github.com/urfave/cli v1.20.0 // indirect
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect

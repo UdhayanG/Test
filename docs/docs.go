@@ -25,7 +25,145 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/register": {
-            "post": {}
+            "post": {
+                "description": "Create a new todo item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RMS"
+                ],
+                "summary": "Create a RMS",
+                "parameters": [
+                    {
+                        "description": "New User",
+                        "name": "RMS",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/form.Registration"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/form.Registration"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "form.Registration": {
+            "type": "object",
+            "required": [
+                "ConfirmPassword",
+                "EmailAddress",
+                "FirstName",
+                "Password"
+            ],
+            "properties": {
+                "Address": {
+                    "type": "string"
+                },
+                "AddressID": {
+                    "type": "integer"
+                },
+                "ConfirmPassword": {
+                    "type": "string"
+                },
+                "CountryID": {
+                    "type": "integer"
+                },
+                "CountryName": {
+                    "type": "string"
+                },
+                "DefaultAddressID": {
+                    "type": "integer"
+                },
+                "DefaultPhoneID": {
+                    "type": "integer"
+                },
+                "EmailAddress": {
+                    "type": "string"
+                },
+                "EmailID": {
+                    "type": "integer"
+                },
+                "Err": {
+                    "type": "string"
+                },
+                "FirstName": {
+                    "type": "string"
+                },
+                "LastName": {
+                    "type": "string"
+                },
+                "LoginID": {
+                    "type": "integer"
+                },
+                "LoginPassword": {
+                    "type": "string"
+                },
+                "LoginTypeDesc": {
+                    "type": "string"
+                },
+                "LoginTypeID": {
+                    "type": "integer"
+                },
+                "MiddleName": {
+                    "type": "string"
+                },
+                "NumberinInterForm": {
+                    "type": "integer"
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "PhoneNoID": {
+                    "type": "integer"
+                },
+                "PhoneNoTypeDesc": {
+                    "type": "string"
+                },
+                "PhoneNoTypeID": {
+                    "type": "integer"
+                },
+                "PhoneNumber": {
+                    "description": "PhoneNumber       string ` + "`" + `json:\"PhoneNumber\" form:\"PhoneNumber\" query:\"PhoneNumber\" validate:\"required\"` + "`" + `",
+                    "type": "string"
+                },
+                "PhonePrefix": {
+                    "type": "integer"
+                },
+                "PostCode": {
+                    "type": "integer"
+                },
+                "RequestKey": {
+                    "type": "string"
+                },
+                "State": {
+                    "type": "string"
+                },
+                "Town": {
+                    "type": "string"
+                },
+                "UserID": {
+                    "type": "integer"
+                },
+                "UserName": {
+                    "type": "string"
+                },
+                "UserNameVerified": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
@@ -43,7 +181,7 @@ type swaggerInfo struct {
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
 	Host:        "localhost:3000",
-	BasePath:    "/register",
+	BasePath:    "/api/v1",
 	Schemes:     []string{},
 	Title:       "RMS Application",
 	Description: "This is a Repair Management Application",

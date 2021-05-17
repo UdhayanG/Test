@@ -50,6 +50,7 @@ func init() {
 	return c.JSON(http.StatusCreated, id)
 	}
 }*/
+
 // CreateRMS godoc
 // @Summary Create a RMS
 // @Description Create a new todo item
@@ -58,7 +59,6 @@ func init() {
 // @Produce json
 // @Param RMS body form.Registration true "New User"
 // @Success 201 {object} form.Registration
-
 // @Router /register [post]
 func Register(tx *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
