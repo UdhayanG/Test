@@ -2,23 +2,24 @@ package main
 
 import (
 	//"RMS-Trail/datastore"
+
+	"RMS-Trail/datastore"
 	"RMS-Trail/handler"
 	"RMS-Trail/utils"
 	"log"
+	"os"
 
 	"encoding/gob"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/sessions"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"gopkg.in/go-playground/validator.v9"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 
 	// "RMS-Trail/domain/form"
 	"encoding/json"
@@ -33,10 +34,18 @@ import (
 // @host localhost:3000
 // @BasePath /api/v1
 func main() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/rms-golang?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
+	//dsn := "root:Ics@2020@tcp(13.126.170.121:3306)/rms-golang?charset=utf8mb4&parseTime=True&loc=Local"
+	//db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Error)})
+	err := godotenv.Load()
+	host := os.Getenv("DB_HOST")
+	user := os.Getenv("DB_USER")
+	pw := os.Getenv("DB_PASSWORD")
+	port := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	//fmt.Printf("============dfdf:%s %s %s %s %s", host, user, pw, port, dbName)
+	db, err := datastore.NewDB(host, user, pw, port, dbName)
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect ghjghjghj")
 	}
 	//db, err := datastore.NewDB()
 	//logFatal(err)
@@ -173,15 +182,15 @@ func main() {
 		fmt.Println(&sess.ID)
 		return c.NoContent(http.StatusOK)
 	  })*/
-
+	//
 	v1 := e.Group("/api/v1")
 	{
-
 		//e.GET("/", handler.Welcome())
 		v1.GET("/users", handler.GetUsers(db))
 		v1.POST("/check", handler.Check(db))
 		v1.POST("/register", handler.Register(db))
 		v1.POST("/registerbyemail", handler.RegisterWithEmail(db))
+		v1.POST("/socialregister", handler.RegisterWithSocial(db))
 	}
 	//e.GET("/getsessval",handler.GetSessVal())
 	//e.POST("/register", handler.Register(db))

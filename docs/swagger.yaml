@@ -101,4 +101,26 @@ paths:
       summary: Create a RMS
       tags:
       - RMS
+  /registerbyemail:
+    post:
+      consumes:
+      - application/json
+      description: Create a new User by Email
+      parameters:
+      - description: New User
+        in: body
+        name: RMS
+        required: true
+        schema:
+          $ref: '#/definitions/form.Registration'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/form.Registration'
+      summary: Create a RMS
+      tags:
+      - RMS
 swagger: "2.0"

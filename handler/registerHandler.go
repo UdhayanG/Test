@@ -67,7 +67,6 @@ func Register(tx *gorm.DB) echo.HandlerFunc {
 		if err := c.Bind(&u); err != nil {
 			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
-
 		sess, _ := session.Get("session", c)
 		sess.Options = &sessions.Options{
 			Path:     "/",
@@ -94,7 +93,14 @@ func Register(tx *gorm.DB) echo.HandlerFunc {
 				return c.JSON(http.StatusUnauthorized, sess.Values["Userdetails"])
 			}
 			var login model.Logins
-			duplicateUserCheck := db.Debug().Where("UserName = ? ", u.PhoneNumber).Find(&login)
+			var duplicateUserCheck *gorm.DB
+			if u.Command == "Email" {
+				duplicateUserCheck = db.Debug().Where("UserName = ? ", u.EmailAddress).Find(&login)
+
+			}
+			if u.Command == "Phone" {
+				duplicateUserCheck = db.Debug().Where("UserName = ? ", u.PhoneNumber).Find(&login)
+			}
 			if duplicateUserCheck.RowsAffected >= 1 {
 				u.Err = "User Name already exists"
 				sess.Values["Userdetails"] = u
@@ -104,7 +110,7 @@ func Register(tx *gorm.DB) echo.HandlerFunc {
 			var loginTypes model.LoginTypes
 			var phoneNoTypes model.PhoneNoTypes
 			var countries model.Countries
-			db.Select("LoginTypeID").Where("LoginTypeDesc = ?", "Phone").First(&loginTypes)
+			db.Select("LoginTypeID").Where("LoginTypeDesc = ?", u.Command).First(&loginTypes)
 			db.Select("PhoneNoTypeID").Where("PhoneNoTypeDesc = ?", "Mobile").First(&phoneNoTypes)
 			db.Select("CountryID").Where("CountryName = ?", "INDIA").First(&countries)
 			phoneInsert := model.PhoneNumbers{CountryID: countries.CountryID, PhoneNumber: u.PhoneNumber, PhoneNoTypeID: phoneNoTypes.PhoneNoTypeID}
@@ -166,6 +172,15 @@ func Register(tx *gorm.DB) echo.HandlerFunc {
 	//return err
 }
 
+// CreateRMS godoc
+// @Summary Create a RMS
+// @Description Create a new User by Email
+// @Tags RMS
+// @Accept json
+// @Produce json
+// @Param RMS body form.Registration true "New User"
+// @Success 201 {object} form.Registration
+// @Router /registerbyemail [post]
 func RegisterWithEmail(tx *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		fmt.Println(c.Request().RequestURI)
@@ -284,6 +299,75 @@ func RegisterWithEmail(tx *gorm.DB) echo.HandlerFunc {
 	//return err
 }
 
+func RegisterWithSocial(tx *gorm.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		var socialuser form.SocialRegistration
+		if err := c.Bind(&socialuser); err != nil {
+			return c.JSON(http.StatusUnauthorized, err.Error())
+		}
+
+		sess, _ := session.Get("session", c)
+		sess.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   86400 * 7,
+			HttpOnly: true,
+			Secure:   false,
+		}
+		fmt.Println(sess.Values["SocialUserdetails"])
+		socialuser.Err = "Registration failed"
+		sess.Values["SocialUserdetails"] = socialuser
+		sess.Save(c.Request(), c.Response())
+		fmt.Println(socialuser)
+		tx.Transaction(func(db *gorm.DB) error {
+			var login model.Logins
+			duplicateUserCheck := db.Debug().Where("UserName = ? ", socialuser.Id).Find(&login)
+			if duplicateUserCheck.RowsAffected >= 1 {
+				socialuser.Err = "User Name already exists"
+				sess.Values["SocialUserdetails"] = socialuser
+				sess.Save(c.Request(), c.Response())
+				return c.JSON(http.StatusCreated, sess.Values["SocialUserdetails"])
+			}
+			var loginTypes model.LoginTypes
+			//	var countries model.Countries
+			//db.Debug().Select("LoginTypeID").Where("LoginTypeDesc = ?", socialuser.LoginType).First(&loginTypes)
+			db.Debug().Select("LoginTypeID").Where("LoginTypeDesc = ?", "Social").First(&loginTypes)
+
+			userInsert := model.User{FirstName: socialuser.FirstName, LastName: socialuser.LastName, DefaultAddressID: 1, DefaultPhoneID: 2}
+			if err := db.Debug().Save(&userInsert).Error; err != nil {
+				db.Rollback()
+				sess.Values["SocialUserdetails"] = socialuser
+				sess.Save(c.Request(), c.Response())
+				return c.JSON(http.StatusInternalServerError, sess.Values["SocialUserdetails"])
+			}
+
+			loginInsert := model.Logins{UserName: socialuser.Id, LoginTypeID: loginTypes.LoginTypeID, UserNameVerified: 1}
+			if err := db.Debug().Save(&loginInsert).Error; err != nil {
+				//fmt.Println(err)
+				db.Rollback()
+				sess.Values["SocialUserdetails"] = socialuser
+				sess.Save(c.Request(), c.Response())
+				return c.JSON(http.StatusInternalServerError, sess.Values["SocialUserdetails"])
+			}
+			loginUserInsert := model.UserLogins{UserID: userInsert.UserID, LoginID: loginInsert.LoginID}
+			if err := db.Debug().Save(&loginUserInsert).Error; err != nil {
+				//fmt.Println(err)
+				db.Rollback()
+				sess.Values["SocialUserdetails"] = socialuser
+				sess.Save(c.Request(), c.Response())
+				return c.JSON(http.StatusInternalServerError, sess.Values["SocialUserdetails"])
+			}
+			return c.JSON(http.StatusCreated, socialuser)
+
+		})
+
+		return nil
+
+	}
+
+}
+
+//Mail
 func sendMail(u form.Registration, ip string) error {
 
 	m := gomail.NewMessage()

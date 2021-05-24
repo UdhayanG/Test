@@ -42,6 +42,40 @@
                     }
                 }
             }
+        },
+        "/registerbyemail": {
+            "post": {
+                "description": "Create a new User by Email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RMS"
+                ],
+                "summary": "Create a RMS",
+                "parameters": [
+                    {
+                        "description": "New User",
+                        "name": "RMS",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/form.Registration"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/form.Registration"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

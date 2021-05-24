@@ -1,8 +1,9 @@
 package form
 
 type Registration struct {
+	Command   string `json:"Command" form:"Command" query:"Command"`
 	AddressID int    `json:"AddressID,omitempty" form:"AddressID" query:"AddressID"`
-	Address   string `json:"Address" form:"name" query:"name"`
+	Address   string `json:"Address" form:"Address" query:"Address"`
 	Town      string `json:"Town" form:"Town" query:"Town"`
 	State     string `json:"State" form:"State" query:"State"`
 	CountryID int    `json:"CountryID" form:"CountryID" query:"CountryID"`
