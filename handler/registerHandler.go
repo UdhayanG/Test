@@ -4,26 +4,45 @@ import (
 	"RMS-Trail/config"
 	"RMS-Trail/domain/form"
 	"RMS-Trail/domain/model"
+	"crypto/rsa"
 	"crypto/tls"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
-
 	gomail "gopkg.in/mail.v2"
+	"gorm.io/gorm"
 )
 
 var (
 	cfg config.Properties
 )
+
+const (
+	tokenExpiresIn = 15000
+)
+const (
+	mySigningKey = "Key,Value"
+)
+
+type Claims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}
+
+type TokenHandler struct {
+	PrivateKey *rsa.PrivateKey
+}
 
 func init() {
 
@@ -156,7 +175,7 @@ func Register(tx *gorm.DB) echo.HandlerFunc {
 				sess.Save(c.Request(), c.Response())
 				return c.JSON(http.StatusInternalServerError, sess.Values["Userdetails"])
 			}
-			return c.JSON(http.StatusCreated, "Registered Successfully")
+			return c.JSON(http.StatusCreated, echo.Map{"status": "Registered Successfully"})
 
 		})
 		/*sess.Options.MaxAge = -1
@@ -230,7 +249,7 @@ func RegisterWithEmail(tx *gorm.DB) echo.HandlerFunc {
 			var loginTypes model.LoginTypes
 			//var phoneNoTypes model.PhoneNoTypes
 			var countries model.Countries
-			db.Select("LoginTypeID").Where("LoginTypeDesc = ?", "Phone").First(&loginTypes)
+			db.Select("LoginTypeID").Where("LoginTypeDesc = ?", "Email").First(&loginTypes)
 			//	db.Select("PhoneNoTypeID").Where("PhoneNoTypeDesc = ?", "Mobile").First(&phoneNoTypes)
 			db.Select("CountryID").Where("CountryName = ?", "INDIA").First(&countries)
 			emailInsert := model.Emails{EmailAddress: u.EmailAddress}
@@ -282,8 +301,10 @@ func RegisterWithEmail(tx *gorm.DB) echo.HandlerFunc {
 				sess.Save(c.Request(), c.Response())
 				return c.JSON(http.StatusInternalServerError, sess.Values["Userdetails"])
 			}
+			fmt.Println("inter")
 			sendMail(u, c.Request().Host)
-			return c.JSON(http.StatusCreated, "Registered Successfully")
+			fmt.Println("outer")
+			return c.JSON(http.StatusCreated, echo.Map{"status": "Registered Successfully"})
 
 		})
 		/*sess.Options.MaxAge = -1
@@ -323,16 +344,17 @@ func RegisterWithSocial(tx *gorm.DB) echo.HandlerFunc {
 			var login model.Logins
 			duplicateUserCheck := db.Debug().Where("UserName = ? ", socialuser.Id).Find(&login)
 			if duplicateUserCheck.RowsAffected >= 1 {
-				socialuser.Err = "User Name already exists"
-				sess.Values["SocialUserdetails"] = socialuser
-				sess.Save(c.Request(), c.Response())
-				return c.JSON(http.StatusCreated, sess.Values["SocialUserdetails"])
+				/*need to handle for future user operation*/
+				return c.JSON(http.StatusCreated, echo.Map{"tempRespose": "Already registered user"})
 			}
 			var loginTypes model.LoginTypes
 			//	var countries model.Countries
 			//db.Debug().Select("LoginTypeID").Where("LoginTypeDesc = ?", socialuser.LoginType).First(&loginTypes)
 			db.Debug().Select("LoginTypeID").Where("LoginTypeDesc = ?", "Social").First(&loginTypes)
-
+			emailInsert := model.Emails{EmailAddress: socialuser.Email}
+			if err := db.Debug().Save(&emailInsert).Error; err != nil {
+				return c.JSON(http.StatusCreated, echo.Map{"err": err})
+			}
 			userInsert := model.User{FirstName: socialuser.FirstName, LastName: socialuser.LastName, DefaultAddressID: 1, DefaultPhoneID: 2}
 			if err := db.Debug().Save(&userInsert).Error; err != nil {
 				db.Rollback()
@@ -340,7 +362,10 @@ func RegisterWithSocial(tx *gorm.DB) echo.HandlerFunc {
 				sess.Save(c.Request(), c.Response())
 				return c.JSON(http.StatusInternalServerError, sess.Values["SocialUserdetails"])
 			}
-
+			emailUserInsert := model.UserEmails{UserID: userInsert.UserID, EmailID: emailInsert.EmailID}
+			if err := db.Debug().Save(&emailUserInsert).Error; err != nil {
+				return c.JSON(http.StatusCreated, echo.Map{"err": err})
+			}
 			loginInsert := model.Logins{UserName: socialuser.Id, LoginTypeID: loginTypes.LoginTypeID, UserNameVerified: 1}
 			if err := db.Debug().Save(&loginInsert).Error; err != nil {
 				//fmt.Println(err)
@@ -372,7 +397,6 @@ func sendMail(u form.Registration, ip string) error {
 
 	m := gomail.NewMessage()
 
-	mainUrl := "http://" + ip + "/account/verify-email?token="
 	// Set E-Mail sender
 	m.SetHeader("From", cfg.MailFromAddress)
 
@@ -382,6 +406,8 @@ func sendMail(u form.Registration, ip string) error {
 	// Set E-Mail subject
 	m.SetHeader("Subject", "RMS Registration")
 
+	jwttoken, _ := NewToken([]byte(mySigningKey), "RMS Registration", u.EmailAddress)
+	mainUrl := "http://" + ip + "/account/verify-email?token=" + jwttoken
 	// Set E-Mail body. You can set plain text or html with text/html
 	//m.SetBody("html/template", "<p><a href="+mainUrl+">"+mainUrl+"</a></p>")
 	m.SetBody("text/html", fmt.Sprintf("<p>Please click the below link to verify your email address:</p> "+
@@ -401,6 +427,110 @@ func sendMail(u form.Registration, ip string) error {
 	}
 
 	return nil
+
+}
+
+func NewToken(mySigningKey []byte, subject string, email string) (string, error) {
+	createdAt := time.Now().Unix()
+	// Create the token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   subject,
+			ExpiresAt: createdAt + tokenExpiresIn,
+			IssuedAt:  createdAt,
+			NotBefore: createdAt,
+		},
+		Email: email,
+	})
+	// Set some claims
+
+	// Sign and get the complete encoded token as a string
+	tokenString, err := token.SignedString(mySigningKey)
+
+	return tokenString, err
+}
+func VerifyEmail(tx *gorm.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.QueryParam("token")
+
+		claims, status, err := Verify(token)
+		if err != nil {
+			return c.String(http.StatusUnauthorized, "invalid request")
+		}
+
+		tx.Transaction(func(db *gorm.DB) error {
+			var login model.Logins
+			userlogindetails := db.Debug().Where("UserName = ? ", claims.Email).Find(&login)
+
+			if userlogindetails.RowsAffected >= 1 {
+				login.UserNameVerified = 1
+				if err := db.Debug().Save(&login).Error; err != nil {
+					//fmt.Println(err)
+					db.Rollback()
+					return c.JSON(http.StatusInternalServerError, "unauthorised")
+				}
+				return c.JSON(http.StatusCreated, login)
+			}
+			return nil
+		})
+		fmt.Println(claims.Email)
+		fmt.Println(claims.Subject)
+		fmt.Println(status)
+		return nil
+	}
+}
+
+func Verify(token string) (*Claims, string, error) {
+	fmt.Println(token)
+	parsed, err := jwt.ParseWithClaims(token, &Claims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(mySigningKey), nil
+	})
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	if claims, ok := parsed.Claims.(*Claims); ok && parsed.Valid {
+		return claims, "valid token", nil
+	}
+	return nil, "", errors.New("invalid token")
+}
+
+func SignIn(tx *gorm.DB) echo.HandlerFunc {
+
+	return func(c echo.Context) error {
+		var loginForm form.Login
+		if err := c.Bind(&loginForm); err != nil {
+			return c.JSON(http.StatusUnauthorized, err.Error())
+		}
+		fmt.Println(loginForm)
+		tx.Transaction(func(db *gorm.DB) error {
+			var loginModel model.Logins
+			usernameList := db.Debug().Where("UserName = ? ", loginForm.UserName).Find(&loginModel)
+
+			if usernameList.RowsAffected == 0 {
+				//loginModel.UserName
+				fmt.Println("jksdfsjkdfg")
+				return c.String(http.StatusUnauthorized, "User Name incorrect")
+			}
+			if usernameList.RowsAffected >= 1 {
+				//encryptpassword, _ := bcrypt.GenerateFromPassword([]byte(loginForm.Password), bcrypt.MinCost)
+				//hash, err := bcrypt.GenerateFromPassword([]byte(loginForm.Password), bcrypt.MinCost)
+				//fmt.Println(string(encryptpassword))
+				err := bcrypt.CompareHashAndPassword([]byte(loginModel.LoginPasswordSalt), []byte(loginForm.Password))
+				if err == nil {
+					//fmt.Println("sema")
+					jwttoken, _ := NewToken([]byte(mySigningKey), "RMS Login", loginForm.UserName)
+					fmt.Println(jwttoken)
+					return c.JSON(http.StatusOK, echo.Map{"token": jwttoken})
+
+				}
+			}
+			return nil
+		})
+
+		return nil
+	}
 
 }
 

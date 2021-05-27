@@ -28,6 +28,10 @@ import (
 	_ "RMS-Trail/docs"
 )
 
+const (
+	mySigningKey = "Key,Value"
+)
+
 // @title RMS Application
 // @description This is a Repair Management Application
 // @version 1.0
@@ -191,7 +195,21 @@ func main() {
 		v1.POST("/register", handler.Register(db))
 		v1.POST("/registerbyemail", handler.RegisterWithEmail(db))
 		v1.POST("/socialregister", handler.RegisterWithSocial(db))
+		v1.POST("/signin", handler.SignIn(db))
+
 	}
+
+	// Restricted group
+	r := e.Group("/api/v1/user/")
+	// Configure middleware with the custom claims type
+	config := middleware.JWTConfig{
+		Claims:     &handler.Claims{},
+		SigningKey: []byte(mySigningKey),
+	}
+	r.Use(middleware.JWTWithConfig(config))
+	//r.GET("", handler.GetUserInfo(db))
+
+	e.GET("/account/verify-email", handler.VerifyEmail(db))
 	//e.GET("/getsessval",handler.GetSessVal())
 	//e.POST("/register", handler.Register(db))
 	//e.POST("/address", handler.Address(db))

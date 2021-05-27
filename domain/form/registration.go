@@ -13,7 +13,7 @@ type Registration struct {
 	PhonePrefix int    `json:"PhonePrefix" form:"PhonePrefix" query:"PhonePrefix"`
 
 	EmailID      int    `json:"EmailID" form:"EmailID" query:"EmailID"`
-	EmailAddress string `json:"EmailAddress" form:"EmailAddress" query:"EmailAddress" validate:"required,email"`
+	EmailAddress string `json:"EmailAddress" form:"EmailAddress" query:"EmailAddress"`
 
 	LoginID          int    `json:"LoginID" form:"LoginID" query:"LoginID"`
 	UserName         string `json:"UserName" form:"UserName" query:"UserName"`
