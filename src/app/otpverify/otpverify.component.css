@@ -1,0 +1,12 @@
+.parent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 194px;
+  }
+
+  /* added for error messages*/
+ .redfont{
+    color:#f44336;
+}

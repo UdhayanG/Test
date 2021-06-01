@@ -1,0 +1,296 @@
+
+<div class="container">
+<div class="main-body">
+
+<div class="row gutters-sm">
+<div class="col-md-4 mb-3">
+<div class="card">
+<div class="card-body">
+<div class="d-flex flex-column align-items-center text-center">
+<img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+<div class="mt-3">
+<h2>John Doe  </h2>
+<p class="text-secondary mb-1">email@gmail.com</p>
+<mat-accordion>
+<mat-expansion-panel hideToggle>
+<mat-expansion-panel-header>
+<mat-panel-title>
+Password
+</mat-panel-title>
+<mat-panel-description>
+Click to reset 
+</mat-panel-description>
+</mat-expansion-panel-header>
+
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Current password</mat-label>
+<input matInput placeholder="Your current password" >
+</mat-form-field>
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>New password</mat-label>
+<input matInput placeholder="Your New password" >
+</mat-form-field>
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Confirm your password</mat-label>
+<input matInput placeholder="Confirm your password" >
+</mat-form-field>
+<button type="button" mat-raised-button color="primary">Reset password</button>
+</mat-expansion-panel>
+</mat-accordion>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="col-md-8"> 
+<form class="example-form"  [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+
+<mat-tab-group>
+<mat-tab label="Personal data"> 
+<p>Please fill your personal details.
+</p>
+<div class="card overflow">
+<div class="card-body">
+<div class="row">
+  <div class="col-sm-6 pad"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>First name</mat-label>
+    <input matInput placeholder="Your first name" formControlName="firstName">
+    </mat-form-field> 
+    <div *ngIf="isValidInput('firstName')" class="theError">
+    <span *ngIf="profileForm.controls['firstName'].errors.required" >
+    First name required.
+    </span>
+    </div> 
+  </div>
+  <div class="col-sm-6 pad">
+  <mat-form-field class="example-full-width" appearance="outline">
+  <mat-label>Middle name</mat-label>
+  <input matInput placeholder="Your Middle name" formControlName="middleName" >
+  </mat-form-field>
+    <div *ngIf="isValidInput('middleName')" class="theError">
+    <span *ngIf="profileForm.controls['middleName'].errors.required" >
+    Middle name required.
+    </span>
+    </div>
+  </div>
+
+</div>
+<div class="row">
+<div class="col-sm-6 pad">
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Last name</mat-label>
+<input matInput placeholder="Your Last name" formControlName="secondName">
+</mat-form-field>
+    <div *ngIf="isValidInput('secondName')" class="theError">
+    <span *ngIf="profileForm.controls['secondName'].errors.required" >
+    Last namerequired.
+    </span>
+    </div>
+</div>
+<div class="col-sm-6 pad">
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Date of birth</mat-label>
+<input type="date" matInput placeholder="Your date of birth" formControlName="dob">
+</mat-form-field>
+    <div *ngIf="isValidInput('dob')" class="theError">
+    <span *ngIf="profileForm.controls['dob'].errors.required" >
+    Date of birth required.
+    </span>
+    </div>
+</div>
+</div>
+<div class="row">
+<div class="col-sm-6 pad"> 
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Phone number</mat-label>
+<input matInput placeholder="Your Phone number" formControlName="phoneNumber">
+</mat-form-field>
+    <div *ngIf="isValidInput('phoneNumber')" class="theError">
+    <span *ngIf="profileForm.controls['phoneNumber'].errors.required" >
+    Phone number required.
+    </span>
+    </div>
+<button type="button" mat-raised-button color="primary" data-toggle="modal" data-target="#phones" >Add another Phone number</button>
+</div>
+<div class="col-sm-6 pad"> 
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Mail address</mat-label>
+<input matInput placeholder="Your Email address" type="email" formControlName="mailAddress">
+</mat-form-field>
+    <div *ngIf="isValidInput('mailAddress')" class="theError">
+    <span *ngIf="profileForm.controls['mailAddress'].errors.required" >
+    Email is required.
+    </span>
+    </div>
+<button type="button" mat-raised-button color="primary" data-toggle="modal" data-target="#mailaddress" >Add another Mail address</button>
+</div>
+</div>
+</div>
+</div> 
+</mat-tab>
+<mat-tab label="Location"> 
+  <p>Please fill your location details.</p>
+<div class="col-sm-12 pad"> <mat-card> 
+<mat-form-field class="example-full-width" appearance="outline" >
+<mat-label>Current Address</mat-label>
+<textarea matInput placeholder="Please enter your Primary address" rows="5"></textarea> 
+</mat-form-field> 
+
+<button type="button" mat-raised-button color="primary" data-toggle="modal" data-target="#address" >Add another address</button>
+</mat-card>
+</div>
+
+
+<div class="col-sm-4 pad"> 
+<mat-card> 
+<mat-form-field class="example-full-width" appearance="outline" >
+<mat-label>Choose your Country</mat-label>
+<mat-select>
+<mat-option *ngFor="let country of country" [value]="country.value">
+{{country.viewValue}}
+</mat-option>
+</mat-select>
+</mat-form-field> 
+</mat-card>
+</div>
+<div class="col-sm-4 pad"> 
+<mat-card> 
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Enter your State</mat-label>
+<input matInput placeholder="Your second name" value="Sushi">
+</mat-form-field>
+</mat-card>
+
+
+</div>
+<div class="col-sm-4 pad"> 
+<mat-card> 
+<mat-form-field class="example-full-width" appearance="outline">
+<mat-label>Enter your Town</mat-label>
+<input matInput placeholder="Your second name" value="Sushi">
+</mat-form-field>
+</mat-card>
+
+
+</div>
+
+
+
+</mat-tab>
+<mat-tab label="Uploads"> 
+<p>Please upload your documents</p>
+<mat-card>
+<button mat-raised-button>click to upload your passport</button>
+</mat-card>
+
+<mat-card>
+<button mat-raised-button>click to upload your ID</button>
+</mat-card>
+
+
+
+</mat-tab>
+</mat-tab-group>
+
+<div class="row"> 
+<div class="col-sm-3"> </div>
+<div class="col-sm-3"> </div>
+<div class="col-sm-3"> </div>
+<div class="col-sm-3 col-xs-12"> 
+<div class="right_float"> 
+<button class="btn-block" mat-raised-button type="submit">click to save your data</button>
+
+</div>
+</div>
+</div>
+</form> 
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+
+<!-- Modal -->
+<div id="phones" class="modal fade" role="dialog">
+<div class="modal-dialog">
+
+<!-- Modal content-->
+<div class="modal-content">
+<form class="example-form"  [formGroup]="phoneForm" (ngSubmit)="add_phone()">
+
+<div class="modal-body">
+<h2 class="modal-title">Add your new Phone number </h2>
+<mat-form-field class="example-full-width">
+<mat-label>Phone number</mat-label>
+<input matInput placeholder="Your Phone number" formControlName="newphoneNumber" value="2323232" >
+</mat-form-field>
+
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-dismiss="modal" id="close_btn">Close
+<span class="fa fa-close"></span></button>
+<button type="submit" class="btn btn-primary" >Add to Phones <span class="fa fa-forward"></span></button>
+</div>
+</form>
+</div>
+
+</div>
+</div>
+<!-- Modal -->
+<div id="mailaddress" class="modal fade" role="dialog">
+<div class="modal-dialog">
+
+<!-- Modal content-->
+<div class="modal-content">
+<form class="example-form"  [formGroup]="emailForm" (ngSubmit)="add_email()">
+
+<div class="modal-body">
+<h2 class="modal-title">Add your new Mail Address </h2>
+ <mat-form-field class="example-full-width" appearance="outline">
+  <mat-label>Mail Address</mat-label>
+  <input type="email" matInput placeholder="Your Middle name" formControlName="newMailid" >
+  </mat-form-field>  
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-dismiss="modal" id="close_btn2">Close
+<span class="fa fa-close"></span></button>
+<button type="submit" class="btn btn-primary" >Add to Mail Address <span class="fa fa-forward"></span></button>
+</div>
+</form>
+</div>
+
+</div>
+</div>
+<!-- Modal -->
+<div id="address" class="modal fade" role="dialog">
+<div class="modal-dialog">
+
+<!-- Modal content-->
+<div class="modal-content">
+
+<div class="modal-body">
+<h2 class="modal-title">Add your new Address </h2>
+
+<mat-form-field class="example-full-width">
+<mat-label>Address</mat-label>
+<textarea matInput placeholder="Please enter your new address" rows="5"></textarea> 
+</mat-form-field>
+
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-dismiss="modal">Close
+<span class="fa fa-close"></span></button>
+<button type="button" class="btn btn-primary" >Add to address <span class="fa fa-forward"></span></button>
+</div>
+</div>
+
+</div>
+</div>

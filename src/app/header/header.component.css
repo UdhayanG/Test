@@ -1,0 +1,18 @@
+.navbar{
+	border-radius: 0px;
+}
+.brander{
+	color: white;
+	text-align: center;
+	display: block;margin-top: auto;
+	padding-top: 5px;
+}
+.navbar-brand{
+	color: white;
+	font-size: large;
+    font-weight: 800;
+}
+.navbar-right li a{
+	color: white; 
+    font-size: medium;
+}

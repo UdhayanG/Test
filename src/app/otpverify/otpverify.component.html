@@ -1,0 +1,20 @@
+<div class="parent">
+    <div class="container-fluid">
+        <form [formGroup]="form" (ngSubmit)="submitForm()">
+        <h3>Enter your OTP </h3>
+        <input type="text" matInput placeholder="Enter OTP"  [formControlName]="'OTP'"  [ngClass]="{ 'is-invalid': submitted && otpvalidation.OTP.errors }" /><br><br>
+        <div *ngIf="submitted && otpvalidation.OTP.errors" class="invalid-feedback">
+        <div class='redfont' *ngIf="otpvalidation.OTP.errors.required">Username is required</div>
+        </div>      
+        <button mat-raised-button class="btn btn-primary" >Confirm OTP <span class="fa fa-forward"></span></button>
+        </form>
+    </div>
+  </div>
+
+  <ng-template #secondDialog>
+    <h2 matDialogTitle>Warning!</h2>
+    <p matDialogContent><em>OTP verified Successfully</em></p>
+    <mat-dialog-actions align="end">
+      <button mat-button matDialogClose>Ok</button>
+    </mat-dialog-actions>
+  </ng-template>

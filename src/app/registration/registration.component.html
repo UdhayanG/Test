@@ -1,0 +1,280 @@
+<!-- Navbar-->
+<header class="header">
+  <nav class="navbar navbar-expand-lg navbar-light py-3">
+  <div class="container"> 
+  <a href="#" class="navbar-brand">
+    <img src="../assets/RMS-Logo.png" alt="" class="img">
+  </a>
+  </div>
+  </nav>
+</header>
+
+<div class="container">
+<div class="row  "> 
+  <div class="col-sm-5 col-lg-5">
+ <!-- <img src="https://res.cloudinary.com/mhmd/image/upload/v1569543678/form_d9sh6m.svg" alt="" class="img">-->
+ <img src="../assets/RMS-Logo.png" alt="" class="img">
+ <h1>Create an Account</h1>
+  <p class="font-italic text-muted mb-0"> 
+  Create an account to get started with our Repair management system. <a [routerLink]="['/Privacypolicy']">Click to read our Privacy policy and rules.</a>
+  </p> 
+  
+<div class="row">
+  <div class="col-lg-4 col-xs-12">
+ <button type="button" class="marger widther" mat-raised-button data-toggle="modal" data-target="#myModal" color="primary">  <span class="font-weight-bold">Login</span>
+</button>
+
+</div>
+  <div class="col-lg-4 col-xs-6">
+  <button mat-raised-button color="primary" class="marger widther" (click)="loginWithFacebook()">  Facebook Login<span class="font-weight-bold "></span>
+</button> 
+
+</div>
+<div class="col-lg-4 col-xs-6 ">
+  <button mat-raised-button color="warn" class="marger widther" (click)="signInWithGoogle()">
+      Google Login<span class="font-weight-bold "></span>
+</button> 
+
+</div>  
+</div> 
+  </div>
+
+<div class="col-sm-7  col-lg-7"> 
+<div class="  padder">
+
+<mat-tab-group mat-align-tabs="start">
+  <mat-tab label="Email Signup">
+ <br>
+
+  <form class="example-form overfl" [formGroup]="form" (ngSubmit)="submitForm()">
+    <div class="row">
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>First name</mat-label>
+    <input type="text" matInput placeholder="First Name"  [formControlName]="'FirstName'"  [ngClass]="{ 'is-invalid': submitted && formvalidation.FirstName.errors }" />
+    <div *ngIf="submitted && formvalidation.FirstName.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="formvalidation.FirstName.errors.required">First Name is required</div>
+    </div>
+    </mat-form-field>
+    </div>
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Middle name</mat-label>
+    <input type="text" matInput placeholder="Ex. Dev"  [formControlName]="'MiddleName'"  />
+    </mat-form-field>
+    </div>
+   
+  </div>
+  <div class="row">
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Last name</mat-label>
+    <input type="text" matInput placeholder="Ex. Dev"  [formControlName]="'LastName'"  [ngClass]="{ 'is-invalid': submitted && formvalidation.LastName.errors }" />
+    <div *ngIf="submitted && formvalidation.LastName.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="formvalidation.LastName.errors.required">Last Name is required</div>
+    </div>
+    </mat-form-field>
+    </div>
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Email ID</mat-label>
+    <input type="email" matInput placeholder="Ex. john@gmail.com" #email [formControlName]="'EmailAddress'"  [ngClass]="{ 'is-invalid': submitted && formvalidation.EmailAddress.errors }" />
+    <div *ngIf="submitted && formvalidation.EmailAddress.errors" class="invalid-feedback">
+    <div class='redfont'  *ngIf="formvalidation.EmailAddress.errors.required">Email is required</div>
+    <div class='redfont'  *ngIf="formvalidation.EmailAddress.errors.email">Email must be a valid email address</div>
+    </div>
+    </mat-form-field>
+    </div>
+ 
+</div>
+<div class="row">
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Password</mat-label>
+    <input type="password" matInput placeholder="Enter a strong password" [formControlName]="'Password'" [ngClass]="{ 'is-invalid': submitted && formvalidation.Password.errors }" />
+    <div *ngIf="submitted && formvalidation.Password.errors" class="invalid-feedback">
+    <div class='redfont'  *ngIf="formvalidation.Password.errors.required">Password is required</div>
+    <div class='redfont'  *ngIf="formvalidation.Password.errors.minlength">Password must be at least 6 characters</div>
+    </div>
+    </mat-form-field>
+    </div>
+
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Confirm password</mat-label>
+    <input type="password" matInput placeholder="Enter Your Password again"[formControlName]="'confirmPassword'" [ngClass]="{ 'is-invalid': submitted && formvalidation.confirmPassword.errors }" />
+    <div *ngIf="submitted && formvalidation.confirmPassword.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="formvalidation.confirmPassword.errors.required">Confirm Password is required</div>
+    <div class='redfont' *ngIf="formvalidation.confirmPassword.errors.mustMatch">Passwords must match</div>
+    </div>
+    </mat-form-field>
+    </div>
+  </div>
+<div class="row">
+<div class="col-lg-4 col-sm-6 col-md-6 col-xs-6 offset-lg-6">
+<button mat-raised-button color="primary">Create your account<span class="font-weight-bold"></span>
+</button>
+</div>  
+</div>
+
+</form>
+</mat-tab>
+
+<mat-tab label="Phone Signup">
+ <br>
+
+  <form class="example-form overfl" [formGroup]="phoneform" (ngSubmit)="submitFormPhone()">
+    <div class="row">
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>First name</mat-label>
+    <input type="text" matInput placeholder="First Name"  [formControlName]="'FirstName'"  [ngClass]="{ 'is-invalid': submitted && phoneformvalidation.FirstName.errors }" />
+    <div *ngIf="submitted && phoneformvalidation.FirstName.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="phoneformvalidation.FirstName.errors.required">First Name is required</div>
+    </div>
+    </mat-form-field>
+    </div>
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Middle name</mat-label>
+    <input type="text" matInput placeholder="Ex. Dev"  [formControlName]="'MiddleName'" />
+    </mat-form-field>
+    </div>
+   
+  </div>
+  <div class="row">
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Last name</mat-label>
+    <input type="text" matInput placeholder="Ex. Dev"  [formControlName]="'LastName'"  [ngClass]="{ 'is-invalid': submitted && phoneformvalidation.LastName.errors }" />
+    <div *ngIf="submitted && phoneformvalidation.LastName.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="phoneformvalidation.LastName.errors.required">Last Name is required</div>
+    </div>
+    </mat-form-field>
+    </div>
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Telephone</mat-label> 
+    <input type="tel" matInput placeholder="555-555-1234"  #phonenumber [formControlName]="'PhoneNumber'"  [ngClass]="{ 'is-invalid': submitted && phoneformvalidation.PhoneNumber.errors }" />
+    <div *ngIf="submitted && phoneformvalidation.PhoneNumber.errors" class="invalid-feedback">
+    <div class='redfont'  *ngIf="phoneformvalidation.PhoneNumber.errors.required">Phone Number is required</div>
+    <div class='redfont'  *ngIf="phoneformvalidation.PhoneNumber.errors.pattern">Invalid Phone Number</div>
+    </div>
+    </mat-form-field>
+    </div>
+ 
+</div>
+<div class="row">
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Password</mat-label>
+    <input type="password" matInput placeholder="Enter a strong password" [formControlName]="'Password'" [ngClass]="{ 'is-invalid': submitted && phoneformvalidation.Password.errors }" />
+    <div *ngIf="submitted && phoneformvalidation.Password.errors" class="invalid-feedback">
+    <div class='redfont'  *ngIf="phoneformvalidation.Password.errors.required">Password is required</div>
+    <div class='redfont'  *ngIf="phoneformvalidation.Password.errors.minlength">Password must be at least 6 characters</div>
+    </div>
+    </mat-form-field>
+    </div>
+
+    <div class="col-sm-6"> 
+    <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Confirm password</mat-label>
+    <input type="password" matInput placeholder="Enter Your Password again"[formControlName]="'confirmPassword'" [ngClass]="{ 'is-invalid': submitted && phoneformvalidation.confirmPassword.errors }" />
+    <div *ngIf="submitted && phoneformvalidation.confirmPassword.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="phoneformvalidation.confirmPassword.errors.required">Confirm Password is required</div>
+    <div class='redfont' *ngIf="phoneformvalidation.confirmPassword.errors.mustMatch">Passwords must match</div>
+    </div>
+    
+    </mat-form-field>
+    </div>
+  </div>
+  
+
+<div class="row">
+<div class="col-lg-4 col-sm-6 col-md-6 col-xs-6 offset-lg-6">
+<button mat-raised-button color="primary">Create your account<span class="font-weight-bold"></span>
+</button>
+</div>  
+</div>
+
+ </form>
+ 
+  </mat-tab> 
+</mat-tab-group>
+ 
+
+</div> 
+</div>
+</div>
+</div>
+
+ 
+
+<!-- Modal -->
+<form  style="position: absolute" class="example-form overfl" [formGroup]="loginForm" (ngSubmit)="signIn()">
+<div  #myModal id="myModal" class="modal fade" role="dialog">
+<div class="modal-dialog">
+
+   <div class="modal-content">
+
+  <div class="modal-body">
+  <h2 class="modal-title">Login </h2>
+
+  <p>Username </p>
+  <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Username</mat-label>
+    <input type="text" matInput placeholder="Username"  [formControlName]="'UserName'"  [ngClass]="{ 'is-invalid': submitted && loginvalidation.UserName.errors }" />
+    <div *ngIf="submitted && loginvalidation.UserName.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="loginvalidation.UserName.errors.required">Username is required</div>
+    </div>
+  </mat-form-field>
+
+  <p>Password </p>   
+  <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Password</mat-label>
+    <input type="password" matInput placeholder="Password"  [formControlName]="'Password'"  [ngClass]="{ 'is-invalid': submitted && loginvalidation.Password.errors }" />
+    <div *ngIf="submitted && loginvalidation.Password.errors" class="invalid-feedback">
+    <div class='redfont' *ngIf="loginvalidation.Password.errors.required">Password is required</div>
+    </div>
+  </mat-form-field> 
+
+
+
+  </div>
+  <div class="modal-footer">
+  <button type="button" class="btn btn-danger" id="modalClose" data-dismiss="modal">Close
+  <span class="fa fa-close"></span></button>
+  <button type="button" class="btn btn-primary" >Forgot password <span class="fa fa-key"></span></button>
+ <!-- <button type="button" class="btn btn-primary" >Proceed <span class="fa fa-forward"></span></button>-->
+  <button mat-raised-button class="btn btn-primary" >Proceed <span class="fa fa-forward"></span></button>
+
+</div>
+  </div>
+
+</div>
+</div>
+</form>
+
+<ng-template #secondDialog>
+  <h2 matDialogTitle>Warning!</h2>
+  <p matDialogContent><em>This Phone Number already exists<br>Please try different Phone Number<br>If you forgot password use this <a>link</a> to change the  password</em></p>
+  <mat-dialog-actions align="end">
+    <button mat-button matDialogClose>Ok</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #firstDialog>
+  <h2 matDialogTitle>Warning!</h2>
+  <p matDialogContent><em>This Email Address already exists<br>Please try different Email<br>If you forgot password use forot password <a>link</a> to change the  password</em></p>
+  <mat-dialog-actions align="end">
+    <button mat-button matDialogClose>Ok</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #loginFail>
+  <h2 matDialogTitle>Warning!</h2>
+  <p matDialogContent><em>UserName/Password Incorrect</em></p>
+  <mat-dialog-actions align="end">
+    <button mat-button matDialogClose>Close</button>
+  </mat-dialog-actions>
+</ng-template>
